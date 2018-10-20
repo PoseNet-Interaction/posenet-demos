@@ -19,9 +19,12 @@ import * as posenet from '@tensorflow-models/posenet';
 
 const color = 'aqua';
 const boundingBoxColor = 'red';
-const lineWidth = 2;
+const lineWidth = 19;
 
-function toTuple({y, x}) {
+function toTuple({
+  y,
+  x
+}) {
   return [y, x];
 }
 
@@ -61,15 +64,24 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
  * Draw pose keypoints onto a canvas
  */
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
-  for (let i = 0; i < keypoints.length; i++) {
+  for (let i = keypoints.length - 1; i >= 0; i--) {
     const keypoint = keypoints[i];
 
     if (keypoint.score < minConfidence) {
       continue;
     }
 
-    const {y, x} = keypoint.position;
-    drawPoint(ctx, y * scale, x * scale, 3, color);
+    const {
+      y,
+      x
+    } = keypoint.position;
+    if (i == 10 || i == 9) {
+      drawPoint(ctx, y * scale, x * scale, 20, 'red');
+    } else if (i == 0) {
+      drawPoint(ctx, y * scale, x * scale, 40, 'red');
+    } else if (i == 1 || i == 2 || i == 3 || i == 4) {} else {
+      drawPoint(ctx, y * scale, x * scale, 10, color);
+    }
   }
 }
 
@@ -177,5 +189,3 @@ export function drawOffsetVectors(
       color, scale, ctx);
   }
 }
-
-
