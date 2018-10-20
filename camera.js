@@ -17,15 +17,13 @@
 import * as posenet from '@tensorflow-models/posenet';
 import dat from 'dat.gui';
 import Stats from 'stats.js';
-import {drawKeypoints, drawSkeleton, drawBoundingBox} from './demo_util';
+import {drawKeypoints, drawSkeleton, drawBoundingBox, compare_pose} from './demo_util';
 
 // const videoWidth = screen.width;
 // const videoHeight = screen.height;
 const videoWidth = 2400;
 const videoHeight = 1200;
 
-console.log("=========================+>");
-console.log(videoWidth, videoHeight);
 const stats = new Stats();
 
 function isAndroid() {
@@ -266,20 +264,47 @@ function detectPoseInRealTime(video, net) {
     // For each pose (i.e. person) detected in an image, loop through the poses
     // and draw the resulting skeleton and keypoints if over certain confidence
     // scores
-    poses.forEach(({score, keypoints}) => {
-      if (score >= minPoseConfidence) {
-        if (guiState.output.showPoints) {
-          drawKeypoints(keypoints, minPartConfidence, ctx);
-        }
-        if (guiState.output.showSkeleton) {
-          drawSkeleton(keypoints, minPartConfidence, ctx);
-        }
-        if (guiState.output.showBoundingBox) {
-          drawBoundingBox(keypoints, ctx);
-        }
-      }
-    });
+    ////////////////////////////
+    var is_checked = false
 
+    for (let i = 0; i < poses.length; i++) {
+      for (let j = i+1; j < poses.length; j++){
+        is_checked = compare_pose(poses[i]['keypoints'], poses[j]['keypoints'], 100, 100);
+        if (is_checked == true){
+          var color = 'red'
+          if (guiState.output.showPoints) {
+            drawKeypoints(poses[i]['keypoints'], minPartConfidence, ctx, color=color);
+            drawKeypoints(poses[j]['keypoints'], minPartConfidence, ctx, color=color);
+          }
+          if (guiState.output.showSkeleton) {
+            drawSkeleton(poses[i]['keypoints'], minPartConfidence, ctx, color=color);
+            drawSkeleton(poses[j]['keypoints'], minPartConfidence, ctx, color=color);
+          }
+          if (guiState.output.showBoundingBox) {
+            drawBoundingBox(poses[i]['keypoints'], ctx);
+            drawBoundingBox(poses[j]['keypoints'], ctx);
+          }
+        }
+
+      }
+    }
+
+    if (is_checked == false) {
+      ///////////////////////////
+      poses.forEach(({score, keypoints}) => {
+        if (score >= minPoseConfidence) {
+          if (guiState.output.showPoints) {
+            drawKeypoints(keypoints, minPartConfidence, ctx, color='yellow');
+          }
+          if (guiState.output.showSkeleton) {
+            drawSkeleton(keypoints, minPartConfidence, ctx, color='yellow');
+          }
+          if (guiState.output.showBoundingBox) {
+            drawBoundingBox(keypoints, ctx);
+          }
+        }
+      });
+    }
     // End monitoring code for frames per second
     stats.end();
 

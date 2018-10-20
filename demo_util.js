@@ -17,17 +17,61 @@
 import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
 
-const color = 'aqua';
+var color = 'aqua';
 const boundingBoxColor = 'red';
 const lineWidth = 2;
+let check = false;
 
 function toTuple({y, x}) {
   return [y, x];
 }
 
-export function drawPoint(ctx, y, x, r, color) {
+export function compare_pose(person_1, person_2, threshold_x, threshold_y, same_pose=false) {
+  // 겹치는 부분이 있는지 확인, +threshold_x, -threshold_x, +threshold_y, -threshold_y 까지 확인
+  // return True or False
+  var check_x = 0;
+  var check_y = 0;
+  console.log(person_1.constructor)
+  for (var key in person_1) {
+    var p1_x = person_1['position']['x'];
+    var p2_x = person_2['position']['x'];
+    var p1_y = person_1['position']['y'];
+    var p2_y = person_2['position']['y'];
+    console.log(p1_x, p2_x, p1_y, p2_y)
+    if ((p1_x - threshold_x <= p2_x && p2_x <= p1_x + threshold_x)) {
+      check_x++;
+    }
+    if ((p1_y - threshold_y <= p2_y && p2_y <= p1_y + threshold_y)) {
+      check_y++;
+    }
+  }
+
+  if (!(same_pose)) {
+    if (check_x >= 1 && check_y >= 1) {
+      check = true;
+    }
+    else {
+      check =  false;
+    }
+  }
+  if (check_x == len(person_1) && check_y == len(person_1)) {
+    check = true;
+  }
+  else {
+    check = false;
+  }
+}
+
+export function drawPoint(ctx, y, x, r, color, check) {
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 2 * Math.PI);
+
+  if (check == true) {
+    color = 'red';
+  } else {
+    color = 'aqua';
+  }
+
   ctx.fillStyle = color;
   ctx.fill();
 }
@@ -47,7 +91,7 @@ export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
 /**
  * Draws a pose skeleton by looking up all adjacent keypoints/joints
  */
-export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
+export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1, color) {
   const adjacentKeyPoints = posenet.getAdjacentKeyPoints(
     keypoints, minConfidence);
 
@@ -60,7 +104,7 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
 /**
  * Draw pose keypoints onto a canvas
  */
-export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
+export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1, color) {
   for (let i = 0; i < keypoints.length; i++) {
     const keypoint = keypoints[i];
 
