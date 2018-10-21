@@ -78,8 +78,13 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     if (i == 10 || i == 9) {
       drawPoint(ctx, y * scale, x * scale, 20, 'red');
     } else if (i == 0) {
-      drawPoint(ctx, y * scale, x * scale, 40, 'red');
-    } else if (i == 1 || i == 2 || i == 3 || i == 4) {} else {
+      // drawPoint(ctx, y * scale, x * scale, 40, 'red');
+    } else if (i == 1 || i == 2 || i == 3) {
+    } else if (i == 4) {
+      var img = new Image();
+      img.src = "9gag_Face.png";
+      ctx.drawImage(img, x-140, y-100);
+    } else {
       drawPoint(ctx, y * scale, x * scale, 10, color);
     }
   }
