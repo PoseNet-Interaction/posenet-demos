@@ -63,6 +63,10 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
 /**
  * Draw pose keypoints onto a canvas
  */
+
+
+
+
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
   for (let i = keypoints.length - 1; i >= 0; i--) {
     const keypoint = keypoints[i];
@@ -70,20 +74,28 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     if (keypoint.score < minConfidence) {
       continue;
     }
-
     const {
       y,
       x
     } = keypoint.position;
-    if (i == 10 || i == 9) {
-      drawPoint(ctx, y * scale, x * scale, 20, 'red');
+    if (i == 10) {
+      // rightWrist
+      var duaRHand = new Image();
+      duaRHand.src = "dua-hand-crop4.png";
+      ctx.drawImage(duaRHand, x, y);
+      //drawPoint(ctx, y * scale, x * scale, 20, 'red');
+    } else if (i == 9) {
+      // leftWrist
+      var duaLHand = new Image();
+      duaLHand.src = "dua-hand-crop-3.png";
+      ctx.drawImage(duaLHand, x, y);
     } else if (i == 0) {
       // drawPoint(ctx, y * scale, x * scale, 40, 'red');
     } else if (i == 1 || i == 2 || i == 3) {
     } else if (i == 4) {
-      var img = new Image();
-      img.src = "9gag_Face.png";
-      ctx.drawImage(img, x-140, y-100);
+      var duaHeadImg = new Image();
+      duaHeadImg.src = "9gag_Face.png";
+      ctx.drawImage(duaHeadImg, x-140, y-100);
     } else {
       drawPoint(ctx, y * scale, x * scale, 10, color);
     }

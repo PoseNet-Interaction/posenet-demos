@@ -259,7 +259,7 @@ function detectPoseInRealTime(video, net) {
       ctx.save();
       ctx.scale(-1, 1);
       ctx.translate(-videoWidth, 0);
-      // ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+      ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
       ctx.restore();
     }
 
