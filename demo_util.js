@@ -80,15 +80,16 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     } = keypoint.position;
     if (i == 10) {
       // rightWrist
-      var duaRHand = new Image();
-      duaRHand.src = "dua-hand-crop4.png";
-      ctx.drawImage(duaRHand, x, y);
-      //drawPoint(ctx, y * scale, x * scale, 20, 'red');
+      //var duaRHand = new Image();
+      //duaRHand.src = "dua-hand-crop4.png";
+      //ctx.drawImage(duaRHand, x, y);
+      drawPoint(ctx, y * scale, x * scale, 20, 'red');
     } else if (i == 9) {
       // leftWrist
-      var duaLHand = new Image();
-      duaLHand.src = "dua-hand-crop-3.png";
-      ctx.drawImage(duaLHand, x, y);
+      //var duaLHand = new Image();
+      //duaLHand.src = "dua-hand-crop-3.png";
+      //ctx.drawImage(duaLHand, x, y);
+      drawPoint(ctx, y * scale, x * scale, 20, 'red');
     } else if (i == 0) {
       // drawPoint(ctx, y * scale, x * scale, 40, 'red');
     } else if (i == 1 || i == 2 || i == 3) {
