@@ -17,8 +17,8 @@
 import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
 
-const color = 'aqua';
-const boundingBoxColor = 'red';
+const color = 'red';
+const boundingBoxColor = 'white';
 const lineWidth = 19;
 
 function toTuple({
@@ -65,8 +65,13 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
  */
 
 
-
-
+var duaHeadImg = new Image();
+duaHeadImg.src = "dua-lipa-head-70.png";
+console.log(duaHeadImg.width, duaHeadImg.height);
+var duaLHand = new Image();
+duaLHand.src = "dua-hand-crop-3.png";
+var duaRHand = new Image(200, 200);
+duaRHand.src = "dua-hand-crop4.png";
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
   for (let i = keypoints.length - 1; i >= 0; i--) {
     const keypoint = keypoints[i];
@@ -80,23 +85,18 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     } = keypoint.position;
     if (i == 10) {
       // rightWrist
-      //var duaRHand = new Image();
-      //duaRHand.src = "dua-hand-crop4.png";
-      //ctx.drawImage(duaRHand, x, y);
-      drawPoint(ctx, y * scale, x * scale, 20, 'red');
+      ctx.drawImage(duaRHand, x - 100, y - 200);
+      //drawPoint(ctx, y * scale, x * scale, 20, 'red');
     } else if (i == 9) {
       // leftWrist
-      //var duaLHand = new Image();
-      //duaLHand.src = "dua-hand-crop-3.png";
-      //ctx.drawImage(duaLHand, x, y);
-      drawPoint(ctx, y * scale, x * scale, 20, 'red');
+      ctx.drawImage(duaLHand, x - 100, y - 200);
+      //drawPoint(ctx, y * scale, x * scale, 20, 'red');
     } else if (i == 0) {
       // drawPoint(ctx, y * scale, x * scale, 40, 'red');
-    } else if (i == 1 || i == 2 || i == 3) {
-    } else if (i == 4) {
-      var duaHeadImg = new Image();
-      duaHeadImg.src = "9gag_Face.png";
-      ctx.drawImage(duaHeadImg, x-140, y-100);
+    } else if (i == 1 || i == 2 || i == 4) {
+    } else if (i ==3) {
+      ctx.drawImage(duaHeadImg, x-180, y - 50);
+      //console.log(duaHeadImg.width, duaHeadImg.height);
     } else {
       drawPoint(ctx, y * scale, x * scale, 10, color);
     }

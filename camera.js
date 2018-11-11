@@ -21,8 +21,8 @@ import {drawKeypoints, drawSkeleton, drawBoundingBox} from './demo_util';
 
 // const videoWidth = screen.width;
 // const videoHeight = screen.height;
-const videoWidth = 2400;
-const videoHeight = 1200;
+const videoWidth = 1200;
+const videoHeight = 800;
 
 console.log("=========================+>");
 console.log(videoWidth, videoHeight);
