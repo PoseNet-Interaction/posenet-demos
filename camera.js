@@ -21,8 +21,8 @@ import {drawKeypoints, drawSkeleton, drawBoundingBox} from './demo_util';
 
 // const videoWidth = screen.width;
 // const videoHeight = screen.height;
-const videoWidth = 2400;
-const videoHeight = 1200;
+const videoWidth = 720;
+const videoHeight = 450;
 
 console.log("=========================+>");
 console.log(videoWidth, videoHeight);
@@ -259,7 +259,7 @@ function detectPoseInRealTime(video, net) {
       ctx.save();
       ctx.scale(-1, 1);
       ctx.translate(-videoWidth, 0);
-      // ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+      ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
       ctx.restore();
     }
 

@@ -17,9 +17,9 @@
 import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
 
-const color = 'aqua';
-const boundingBoxColor = 'red';
-const lineWidth = 19;
+let color = 'aqua';
+const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
+const lineWidth = 10;
 
 function toTuple({
   y,
@@ -60,10 +60,16 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
   });
 }
 
+let left = ["leftElbow"];
+let right = ["rightElbow"];
 /**
  * Draw pose keypoints onto a canvas
  */
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
+  //save five to a text file
+  // five[i][0] == nose
+  // nose 끼리 비교해서 가까운 애들이 10px 안에 있으면 색깔 체인지
+  // nose 비교 loop가 끝나면 five 다시 empty
   for (let i = keypoints.length - 1; i >= 0; i--) {
     const keypoint = keypoints[i];
 
@@ -77,9 +83,27 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     } = keypoint.position;
     if (i == 10 || i == 9) {
       drawPoint(ctx, y * scale, x * scale, 20, 'red');
-    } else if (i == 0) {
+    } else if (i == 0) { //nose
       drawPoint(ctx, y * scale, x * scale, 40, 'red');
-    } else if (i == 1 || i == 2 || i == 3 || i == 4) {} else {
+    } else if (i == 1 || i == 2 || i == 3 || i == 4) {
+      //face
+    } else if (i == 7){
+      drawPoint(ctx, y * scale, x * scale, 10, color);
+      // // leftElbow
+      // if (left.length < 10) {
+      //   left.push([y*scale, x*scale]);
+      // } else {
+      //   console.log(left);
+      // }
+    } else if (i == 8) {
+      drawPoint(ctx, y * scale, x * scale, 10, color);
+      // // rightElbow
+      // if (right.length < 10) {
+      //   right.push([y*scale, x*scale]);
+      // } else {
+      //   console.log(right);
+      // }
+    } else {
       drawPoint(ctx, y * scale, x * scale, 10, color);
     }
   }
@@ -90,16 +114,78 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
  * in an image, the bounding box will begin at the nose and extend to one of
  * ankles
  */
+
+let leftSide = [];
+let rightSide = [];
+let adjacentBool = false;
+
 export function drawBoundingBox(keypoints, ctx) {
   const boundingBox = posenet.getBoundingBox(keypoints);
-
   ctx.rect(boundingBox.minX, boundingBox.minY,
     boundingBox.maxX - boundingBox.minX, boundingBox.maxY - boundingBox.minY);
+
+  console.log("=======DRAW BOUNDING BOX========");
+  // BOXCOORD[X]
+  // X = 0: left top, 1: right top, 2: right bottom, 3: left bottom
+
+  // 1. adding COORDINATES the array
+  let boxCoord = posenet.getBoundingBoxPoints(keypoints);
+  if (leftSide.length < 20) {
+    leftSide.push(boxCoord[0].x);
+    console.log(leftSide);
+  } if (rightSide.length < 20) {
+    rightSide.push(boxCoord[1].x);
+    console.log(rightSide);
+  }
+
+  // 2. WHEN ARRAY IS FULL
+  if (leftSide.length == 20 && rightSide.length == 20) {
+    leftSide = leftSide.sort((a,b) => a-b);
+    rightSide = rightSide.sort((a,b) => a-b);
+
+    console.log("left : ", leftSide, " right: ", rightSide)
+
+    // 3. COMPARE FULL ARRAYS
+    compareArrays(leftSide, rightSide);
+  }
+
+  console.log("======SINGLE CALL========")
 
   ctx.strokeStyle = boundingBoxColor;
   ctx.stroke();
 }
 
+async function compareArrays(a, b) {
+  let count = 0;
+  // MAKE B RANGE ARRAYS
+  let largeB = b.map(n=>n+5);
+  let smallB = b.map(n=>n-5);
+  console.log("=====COMPARE ARRAYS");
+  console.log("largeB: ", largeB, "a array: ", a, "smallB: ", smallB); //entire arrays
+
+  // COMPARE ALL ITEMS A WITHIN ITEMS B RANGE
+  for (let i=0; i < b.length; i++){
+    for(let j=0; j < a.length;j++) {
+      // a 값이 b range 내에 있으면 count + 1
+      (smallB[i] <= a[j] && a[j] <= largeB[i]) ? count++ : count;
+    }
+  }
+
+  // 3번 이상 범주 안에 들어오면 겹쳤다고 판단. TRUE로 변경
+  console.log("count is: ", count);
+  adjacentBool = (count > 3) ? true : false
+  console.log("adjacentBool: ", adjacentBool);
+
+  // true = adjacent = green, false = not adjacent = aqua
+  (adjacentBool === true) ? (color = "green") : (color = "aqua");
+  console.log("=======COMPARE COUNT, BOOl, COLOR======");
+  console.log(count, adjacentBool, color);
+
+  // RESET. count 끝나면 원상복귀.
+  console.log("======RESET=======");
+  leftSide = [];
+  rightSide = [];
+}
 /**
  * Converts an arary of pixel data into an ImageData object
  */
@@ -152,7 +238,9 @@ export function drawHeatMapValues(heatMapValues, outputStride, canvas) {
  */
 function drawPoints(ctx, points, radius, color) {
   const data = points.buffer().values;
-
+  // console.log("=======drawPoints=======");
+  // console.log(points);
+  // console.log("=======one call========")
   for (let i = 0; i < data.length; i += 2) {
     const pointY = data[i];
     const pointX = data[i + 1];
