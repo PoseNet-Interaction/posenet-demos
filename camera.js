@@ -268,11 +268,11 @@ function detectPoseInRealTime(video, net) {
     // scores
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (guiState.output.showPoints) {
-          drawKeypoints(keypoints, minPartConfidence, ctx);
-        }
         if (guiState.output.showSkeleton) {
           drawSkeleton(keypoints, minPartConfidence, ctx);
+        }
+        if (guiState.output.showPoints) {
+          drawKeypoints(keypoints, minPartConfidence, ctx);
         }
         if (guiState.output.showBoundingBox) {
           drawBoundingBox(keypoints, ctx);

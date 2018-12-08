@@ -17,8 +17,8 @@
 import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
 
-let color = 'aqua';
-const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
+let color = 'rgba(255, 255, 255, 0.2)';
+const boundingBoxColor = 'rgba(255, 0, 0, 0.3)'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
 const lineWidth = 10;
 
 function toTuple({
@@ -81,28 +81,18 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
       y,
       x
     } = keypoint.position;
-    if (i == 10 || i == 9) {
+    if (i == 10 || i == 9) { // wrists
       drawPoint(ctx, y * scale, x * scale, 20, 'red');
-    } else if (i == 0) { //nose
-      drawPoint(ctx, y * scale, x * scale, 40, 'red');
-    } else if (i == 1 || i == 2 || i == 3 || i == 4) {
-      //face
-    } else if (i == 7){
-      drawPoint(ctx, y * scale, x * scale, 10, color);
-      // // leftElbow
-      // if (left.length < 10) {
-      //   left.push([y*scale, x*scale]);
-      // } else {
-      //   console.log(left);
-      // }
-    } else if (i == 8) {
-      drawPoint(ctx, y * scale, x * scale, 10, color);
-      // // rightElbow
-      // if (right.length < 10) {
-      //   right.push([y*scale, x*scale]);
-      // } else {
-      //   console.log(right);
-      // }
+    } else if (i == 0) {  // nose
+      console.log("======keypoint draw========");
+      console.log(adjacentBool);
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 40, 'red');
+      } else {
+        let img = new Image();
+        img.src = "9gag_Face.png";
+        ctx.drawImage(img, x-50, y-50, 200, 200);
+      }
     } else {
       drawPoint(ctx, y * scale, x * scale, 10, color);
     }
@@ -130,16 +120,16 @@ export function drawBoundingBox(keypoints, ctx) {
 
   // 1. adding COORDINATES the array
   let boxCoord = posenet.getBoundingBoxPoints(keypoints);
-  if (leftSide.length < 20) {
+  if (leftSide.length < 30) {
     leftSide.push(boxCoord[0].x);
     console.log(leftSide);
-  } if (rightSide.length < 20) {
+  } if (rightSide.length < 30) {
     rightSide.push(boxCoord[1].x);
     console.log(rightSide);
   }
 
   // 2. WHEN ARRAY IS FULL
-  if (leftSide.length == 20 && rightSide.length == 20) {
+  if (leftSide.length == 30 && rightSide.length == 30) {
     leftSide = leftSide.sort((a,b) => a-b);
     rightSide = rightSide.sort((a,b) => a-b);
 
@@ -147,6 +137,9 @@ export function drawBoundingBox(keypoints, ctx) {
 
     // 3. COMPARE FULL ARRAYS
     compareArrays(leftSide, rightSide);
+
+    // 4. if adjacentBool is TRUE, don't change to false until
+    // compareArrays show nothing overlaps..
   }
 
   console.log("======SINGLE CALL========")
@@ -160,7 +153,7 @@ async function compareArrays(a, b) {
   // MAKE B RANGE ARRAYS
   let largeB = b.map(n=>n+5);
   let smallB = b.map(n=>n-5);
-  console.log("=====COMPARE ARRAYS");
+  console.log("=====COMPARE ARRAYS=====");
   console.log("largeB: ", largeB, "a array: ", a, "smallB: ", smallB); //entire arrays
 
   // COMPARE ALL ITEMS A WITHIN ITEMS B RANGE
@@ -177,7 +170,7 @@ async function compareArrays(a, b) {
   console.log("adjacentBool: ", adjacentBool);
 
   // true = adjacent = green, false = not adjacent = aqua
-  (adjacentBool === true) ? (color = "green") : (color = "aqua");
+  (adjacentBool === true) ? (color = "rgba(0, 255, 0, 0.3)") : (color = "rgba(0, 0, 255, 0.3)");
   console.log("=======COMPARE COUNT, BOOl, COLOR======");
   console.log(count, adjacentBool, color);
 
