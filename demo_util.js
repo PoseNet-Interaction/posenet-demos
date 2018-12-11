@@ -17,9 +17,9 @@
 import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
 
-let color = 'rgba(255, 255, 255, 0.2)';
-const boundingBoxColor = 'rgba(255, 0, 0, 0.3)'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
-const lineWidth = 10;
+let color = 'rgba(255, 255, 255, 0.1)';
+const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
+const lineWidth = 50;
 
 function toTuple({
   y,
@@ -39,13 +39,28 @@ export function drawPoint(ctx, y, x, r, color) {
  * Draws a line on a canvas, i.e. a joint
  */
 export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
+  // ax > bx
+  // ay > by
+
   ctx.beginPath();
   ctx.moveTo(ax * scale, ay * scale);
   ctx.lineTo(bx * scale, by * scale);
   ctx.lineWidth = lineWidth;
   ctx.strokeStyle = color;
   ctx.stroke();
+
+  // ctx.beginPath();
+  // ctx.ellipse((ax+bx)/2, (ay+by)/2, 50, 100, 0, 0, Math.PI * 4);
+  // ctx.fillStyle = 'green';
+  // ctx.fill();
+  //
+  // ctx.beginPath();
+  // ctx.arc((ax+bx)/2, (ay+by)/2, 10, 0, 2 * Math.PI);
+  // ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+  // ctx.fill();
+
 }
+
 
 /**
  * Draws a pose skeleton by looking up all adjacent keypoints/joints
@@ -82,19 +97,20 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
       x
     } = keypoint.position;
     if (i == 10 || i == 9) { // wrists
-      drawPoint(ctx, y * scale, x * scale, 20, 'red');
+      drawPoint(ctx, y * scale, x * scale, 40, color);
     } else if (i == 0) {  // nose
-      console.log("======keypoint draw========");
-      console.log(adjacentBool);
+      // console.log("======keypoint draw========");
+      // console.log(adjacentBool);
       if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 40, 'red');
+        drawPoint(ctx, y * scale, x * scale, 40, 'rgba(255, 255, 255, 0.1)');
       } else {
         let img = new Image();
         img.src = "9gag_Face.png";
         ctx.drawImage(img, x-50, y-50, 200, 200);
       }
-    } else {
-      drawPoint(ctx, y * scale, x * scale, 10, color);
+    } //else if (i == 1 || i == 2 || i == 3 || i == 4) { }
+    else {
+      // drawPoint(ctx, y * scale, x * scale, 10, color);
     }
   }
 }
@@ -170,7 +186,7 @@ async function compareArrays(a, b) {
   console.log("adjacentBool: ", adjacentBool);
 
   // true = adjacent = green, false = not adjacent = aqua
-  (adjacentBool === true) ? (color = "rgba(0, 255, 0, 0.3)") : (color = "rgba(0, 0, 255, 0.3)");
+  (adjacentBool === true) ? (color = "rgba(0, 255, 0, 0.3)") : (color = "rgba(255, 255, 255, 0.1)");
   console.log("=======COMPARE COUNT, BOOl, COLOR======");
   console.log(count, adjacentBool, color);
 
