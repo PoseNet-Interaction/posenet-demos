@@ -286,3 +286,5 @@ export function drawOffsetVectors(
       color, scale, ctx);
   }
 }
+
+export {adjacentBool}
