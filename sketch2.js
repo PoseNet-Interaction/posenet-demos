@@ -13,7 +13,8 @@ import {adjacentBool} from './demo_util';
 //   fill(204, 101, 192, 127);
 //   ellipse(100, 100, 200, 200);
 // }
-
+let width = 720;
+let height = 450;
 
 var sketch = function(p) {
   let canvasp;
@@ -47,9 +48,6 @@ var sketch = function(p) {
 
   // snowflake class
 var snowflake = function() {
-  let width = 720;
-  let height = 450;
-
   // initialize coordinates
   this.posX = 0;
   this.posY = p.random(-50, 0);
