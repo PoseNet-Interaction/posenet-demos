@@ -166,3 +166,5 @@ var drawShape = function(context, scale, world, body, fixture) {
   context.stroke();
   context.restore();
 };
+
+export {scaleFactor, scaleToWorld, scaleToPixels, createWorld, debugDraw, drawJoint, drawShape};

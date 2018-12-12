@@ -1,12 +1,8 @@
 import * as p from 'p5';
-// import * as box2d from 'box2d-helper';
-const box2d = window.box2d-helper;
-// const dwolla = window.dwolla;
+import * as box2d from './box2dHelper';
+// import * as box2d5 from './box2dHtml5';
 
 // import { box2d-helper } as box2d from 'p5/lib/box2d-helper';
-// The Nature of Code
-// Daniel Shiffman
-// http://natureofcode.com
 
 // A rectangular box
 let world;
@@ -29,7 +25,7 @@ var sketch = function(p) {
     canvasp.position(0, 0);
     canvasp.style('z-index', '-1');
 
-    world = createWorld();
+    world = box2d.createWorld();
 
   // Add a bunch of fixed boundaries
     boundaries.push(new Boundary(width, height - 10, width*2, 10, 0));
@@ -56,10 +52,10 @@ var sketch = function(p) {
       }
     }
   };
-  p.mousePressed = function() {
-    let p = new Lollipop(p.mouseX, p.mouseY);
-    pops.push(p);
-  };
+  // p.mousePressed = function() {
+  //   let p = new Lollipop(p.mouseX, p.mouseY);
+  //   pops.push(p);
+  // };
   // end of sketch.js
 
   // Lollipop Constructor
@@ -69,17 +65,17 @@ var sketch = function(p) {
       this.r = 3;
 
       // Define a body
-      let bd = new p.box2d.b2BodyDef();
+      let bd = new box2d.b2BodyDef();
       bd.type = box2d.b2BodyType.b2_dynamicBody;
-      bd.position = p.scaleToWorld(x, y);
+      bd.position = scaleToWorld(x, y);
 
 
       // Define fixture #2
-      let fd2 = new p.box2d.b2FixtureDef();
-      fd2.shape = new p.box2d.b2CircleShape();
-      fd2.shape.m_radius = p.scaleToWorld(this.r);
-      let offset = p.scaleToWorld(new p.box2d.b2Vec2(0, -this.h / 2));
-      fd2.shape.m_p = new p.box2d.b2Vec2(offset.x, offset.y);
+      let fd2 = new box2d.b2FixtureDef();
+      fd2.shape = new box2d.b2CircleShape();
+      fd2.shape.m_radius = scaleToWorld(this.r);
+      let offset = scaleToWorld(new box2d.b2Vec2(0, -this.h / 2));
+      fd2.shape.m_p = new box2d.b2Vec2(offset.x, offset.y);
       fd2.density = 1.0;
       fd2.friction = 0.5;
       fd2.restitution = 0.2;
@@ -90,8 +86,8 @@ var sketch = function(p) {
       this.body.CreateFixture(fd2);
 
       // Some additional stuff
-      this.body.SetLinearVelocity(new p.box2d.b2Vec2(p.random(-5, 5), p.random(2, 5)));
-      this.body.SetAngularVelocity(p.random(-5, 5));
+      this.body.SetLinearVelocity(new box2d.b2Vec2(random(-5, 5), random(2, 5)));
+      this.body.SetAngularVelocity(random(-5, 5));
 
     // This function removes the particle from the box2d world
     this.killBody = function() {
@@ -131,13 +127,6 @@ var sketch = function(p) {
     }
   }
 
-  // boundary Constructor
-  // The Nature of Code
-// Daniel Shiffman
-// http://natureofcode.com
-
-// A fixed boundary class
-
 // A boundary is a simple rectangle with x,y,width,and height
   var Boundary = function(x, y, w, h) {
       // But we also have to make a body for box2d to know about it
@@ -152,13 +141,13 @@ var sketch = function(p) {
       fd.friction = 0.5;
       fd.restitution = 0.2;
 
-      let bd = new p.box2d.b2BodyDef();
+      let bd = new box2d.b2BodyDef();
 
       bd.type = box2d.b2BodyType.b2_staticBody;
-      bd.position.x = p.scaleToWorld(this.x);
-      bd.position.y = p.scaleToWorld(this.y);
-      fd.shape = new p.box2d.b2PolygonShape();
-      fd.shape.SetAsBox(this.w / (p.scaleFactor * 2), this.h / (p.scaleFactor * 2));
+      bd.position.x = box2d.scaleToWorld(this.x);
+      bd.position.y = box2d.scaleToWorld(this.y);
+      fd.shape = new box2d.b2PolygonShape();
+      fd.shape.SetAsBox(this.w / (box2d.scaleFactor * 2), this.h / (box2d.scaleFactor * 2));
       this.body = world.CreateBody(bd).CreateFixture(fd);
 
     // Draw the boundary, if it were at an angle we'd have to do something fancier
