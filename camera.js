@@ -100,7 +100,7 @@ const guiState = {
     showVideo: false,
     showSkeleton: true,
     showPoints: true,
-    showBoundingBox: false,
+    showBoundingBox: true,
   },
   net: null,
 };
@@ -268,11 +268,11 @@ function detectPoseInRealTime(video, net) {
     // scores
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (guiState.output.showSkeleton) {
-          drawSkeleton(keypoints, minPartConfidence, ctx);
-        }
         if (guiState.output.showPoints) {
           drawKeypoints(keypoints, minPartConfidence, ctx);
+        }
+        if (guiState.output.showSkeleton) {
+          drawSkeleton(keypoints, minPartConfidence, ctx);
         }
         if (guiState.output.showBoundingBox) {
           drawBoundingBox(keypoints, ctx);
@@ -321,3 +321,4 @@ navigator.getUserMedia = navigator.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 // kick off the demo
 bindPage();
+export {videoWidth, videoHeight};

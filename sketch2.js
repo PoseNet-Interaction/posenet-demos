@@ -1,33 +1,45 @@
 import * as p from 'p5';
-import {adjacentBool} from './demo_util';
-// import {videoWidth, videoHeight} from './camera';
-// import {snowConstructor, snowRender, snowUpdate } from './snowflake';
+import {videoWidth, videoHeight} from './camera';
 
-let width = 720;
-let height = 450;
-let bool = adjacentBool;
+
+let width = videoWidth;
+let height = videoHeight;
 
 var sketch = function(p) {
   let canvasp;
   let snowflakes = [];
+  let ele = document.getElementById("boolean"); // GET p id
+  let bool; // GET changing innerHTML value
 
   p.setup = function() {
     canvasp = p.createCanvas(width, height).parent('sketchDiv');
     p.background('rgba(0,0,0, 0.5)');
     canvasp.position(0, 0);
     canvasp.style('z-index', '-1');
+    bool = ele.innerHTML;
+    console.log("initial", bool);
+
+
   };
 
   p.draw = function() {
+    // GRAB html element to check boolean value from demo_util.js
+    bool = ele.innerHTML;
+
+    // UPDATE background
     p.background(0);
-    let t = p.frameCount / 80;
+    let t = p.frameCount / 60;
+    // console.log("bool is", adjacentBool);
 
-    // create a random number of snowflakes each frame
-   for (var i = 0; i < p.random(3); i++) {
-     snowflakes.push(new snowflake()); // append snowflake object
-   }
+    // CREATE a random number of snowflakes each frame
+    if (bool === 'adjacent') {
+     console.log(bool);
+     for (var i = 0; i < p.random(3); i++) {
+       snowflakes.push(new snowflake()); // append snowflake object
+     }
+  };
 
-   // loop through snowflakes with a for..of loop
+   // LOOP through snowflakes with a for..of loop
    for (let flake of snowflakes) {
      flake.update(t); // update snowflake position
      flake.display(); // draw snowflake
@@ -74,5 +86,4 @@ var sketch = function(p) {
 
 
 var myp5 = new p5(sketch, document.getElementById('sketchDiv'));
-
 // console: <canvas id="defaultCanvas0" class="p5Canvas" width="200" height="200" style="width: 200px; height: 200px;"></canvas>
