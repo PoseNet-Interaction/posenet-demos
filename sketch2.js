@@ -3,17 +3,6 @@ import {adjacentBool} from './demo_util';
 // import {videoWidth, videoHeight} from './camera';
 // import {snowConstructor, snowRender, snowUpdate } from './snowflake';
 
-// function setup() {
-//   canvas = createCanvas(100, 100);
-//   canvas.parent('sketchDiv');
-//   canvas.position(0,0);
-//   canvas.style('z-index', '-1');
-// }
-//
-// function draw() {
-//   fill(204, 101, 192, 127);
-//   ellipse(100, 100, 200, 200);
-// }
 let width = 720;
 let height = 450;
 let bool = adjacentBool;
@@ -42,11 +31,6 @@ var sketch = function(p) {
    for (let flake of snowflakes) {
      flake.update(t); // update snowflake position
      flake.display(); // draw snowflake
-     if (flake.checkEdges()) {
-       flake.update(0);
-       flake.speed = 0
-       flake.newAngle = 0;
-     }
    };
   }
 
@@ -74,27 +58,16 @@ var sketch = function(p) {
       this.posY += p.pow(this.size, 0.3);
 
       // delete snowflake if past end of screen
-      //   if (this.posY > height - 20) {
-      //     let index = snowflakes.indexOf(this);
-      //     snowflakes.splice(index, 1);
-      //   }
+        if (this.posY > height) {
+          let index = snowflakes.indexOf(this);
+          snowflakes.splice(index, 1);
+        }
     };
 
     this.display = function() {
       let opacity = p.random(0.4, 0.5);
-      // p.fill(255, opacity) ;
-      // p.noStroke();
-      // p.noStroke();
       p.stroke(255, 0.4);
-      // p.fill(255, opacity);
       p.ellipse(this.posX, this.posY, this.size);
-    };
-
-    this.checkEdges = function() {
-      if(this.posY > (height - this.size)) {
-        this.posY = (height - this.size);
-        return true;
-      };
     };
   }
 }
