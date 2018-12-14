@@ -16,8 +16,9 @@
  */
 import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
+import { decodeMatrixFromUnpackedColorRGBAArray } from '@tensorflow/tfjs-core/dist/kernels/webgl/tex_util';
 
-let color = 'rgba(255, 255, 255, 0.1)';
+let color = 'rgba(255, 255, 255, 0.3)';
 const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
 const lineWidth = 10;
 
@@ -41,24 +42,17 @@ export function drawPoint(ctx, y, x, r, color) {
 export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
   // ax > bx
   // ay > by
-
-  ctx.beginPath();
-  ctx.setLineDash([5, 15]);
-  ctx.moveTo(ax * scale, ay * scale);
-  ctx.lineTo(bx * scale, by * scale);
-  ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = 'rgba(200, 200, 0, 0.3)';
-  ctx.stroke();
-
-  // ctx.beginPath();
-  // ctx.ellipse((ax+bx)/2, (ay+by)/2, 50, 100, 0, 0, Math.PI * 4);
-  // ctx.fillStyle = 'green';
-  // ctx.fill();
-  //
-  // ctx.beginPath();
-  // ctx.arc((ax+bx)/2, (ay+by)/2, 10, 0, 2 * Math.PI);
-  // ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-  // ctx.fill();
+  if (adjacentBool == false) {
+    ctx.beginPath();
+    ctx.setLineDash([10, 15]);
+    ctx.moveTo(ax * scale, ay * scale);
+    ctx.lineTo(bx * scale, by * scale);
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = 'rgba(200, 200, 0)';
+    ctx.stroke();
+  } else {
+    //nothing
+  }
 
 }
 
@@ -66,7 +60,7 @@ export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
 /**
  * Draws a pose skeleton by looking up all adjacent keypoints/joints
  */
-export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
+export function drawSkeleton(keypoints, minConfidence, ctx, scale = 0.5) {
   const adjacentKeyPoints = posenet.getAdjacentKeyPoints(
     keypoints, minConfidence);
 
@@ -81,7 +75,7 @@ let right = ["rightElbow"];
 /**
  * Draw pose keypoints onto a canvas
  */
-export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
+export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
   //save five to a text file
   // five[i][0] == nose
   // nose 끼리 비교해서 가까운 애들이 10px 안에 있으면 색깔 체인지
@@ -99,15 +93,50 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     } = keypoint.position;
     if (i == 0) {  // nose
       if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, 'rgba(255, 255, 255, 0.3)');
+        drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
-        let img = new Image();
-        img.src = "9gag_Face.png";
-        ctx.drawImage(img, x-50, y-50, 200, 200);
+        let img0 = new Image();
+        img0.src = "olafFace.png";
+        ctx.drawImage(img0, scale*(x-200), scale*(y-30), 300, 300);
+      }
+    } else if (i == 9) { // leftWrist
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 50, color);
+      } else {
+        let img9 = new Image();
+        img9.src = "rightHand_orange.png";
+        ctx.drawImage(img9, scale*(x-200), scale*(y-400), 200, 200);
+      }
+    } else if (i == 10) { // rightWrist
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 50, color);
+      } else {
+        let img9 = new Image();
+        img9.src = "leftHand_orange.png";
+        ctx.drawImage(img9, scale*(x-200), scale*(y-400), 200, 200);
+      }
+    } else if (i == 13 || i == 14) { // leftKnee 
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 50, color);
+      } else {  
+        let img13 = new Image();
+        img13.src = "olafLeftFoot.png";
+        ctx.drawImage(img13, scale*(x-150), scale*(y), 150, 150); 
+      }      
+    } else if (i == 6) { // rightShoulder 
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 50, color);
+      } else {   
+        let img6 = new Image();
+        img6.src = "olafBodySum.png";
+        ctx.drawImage(img6, scale*(x - 30), scale*(y + 300), 200, 200);
       }
     } else if (i == 1 || i == 2 || i == 3 || i == 4) {
     } else {
-      drawPoint(ctx, y * scale, x * scale, 50, color);
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 50, color);
+      } else {  
+      }
     }
   }
 }
@@ -178,7 +207,7 @@ async function compareArrays(a, b) {
   // 3번 이상 범주 안에 들어오면 겹쳤다고 판단. TRUE로 변경
   adjacentBool = (count > 3) ? true : false;
 
-  (adjacentBool === true) ? (color = "rgba(0, 255, 0, 0.3)") : (color = "rgba(255, 255, 255, 0.3)");
+  // (adjacentBool === true) ? (color = "rgba(0, 255, 0, 0.3)") : (color = "rgba(255, 255, 255, 0.3)");
 
   // RESET. count 끝나면 원상복귀.
   leftSide = [];
@@ -195,8 +224,8 @@ async function compareArrays(a, b) {
 
 export async function boolValue(htmlValue) {
   ele.innerHTML = htmlValue;
-  console.log(htmlValue);
-  console.log(ele.innerHTML);
+  // console.log(htmlValue);
+  // console.log(ele.innerHTML);
 }
 /**
  * Converts an arary of pixel data into an ImageData object

@@ -8,8 +8,13 @@ let height = videoHeight;
 var sketch = function(p) {
   let canvasp;
   let snowflakes = [];
+  let singleFlake;
   let ele = document.getElementById("boolean"); // GET p id
   let bool; // GET changing innerHTML value
+  
+  p.preload = function() {
+    singleFlake = p.loadImage('snowflake.png');
+  }
 
   p.setup = function() {
     canvasp = p.createCanvas(width, height).parent('sketchDiv');
@@ -25,17 +30,15 @@ var sketch = function(p) {
   p.draw = function() {
     // GRAB html element to check boolean value from demo_util.js
     bool = ele.innerHTML;
-
     // UPDATE background
     p.background(0);
     let t = p.frameCount / 60;
     // console.log("bool is", adjacentBool);
-
     // CREATE a random number of snowflakes each frame
     if (bool === 'adjacent') {
      console.log(bool);
      for (var i = 0; i < p.random(3); i++) {
-       snowflakes.push(new snowflake()); // append snowflake object
+       snowflakes.push(new snowflake(singleFlake)); // append snowflake object
      }
   };
 
@@ -47,7 +50,7 @@ var sketch = function(p) {
   }
 
   // snowflake class
-  var snowflake = function() {
+  var snowflake = function(img) {
     // initialize coordinates
     this.posX = 0;
     this.posY = p.random(-50, 0);
@@ -55,6 +58,7 @@ var sketch = function(p) {
     this.size = p.random(4, 7);
     this.speed = 0.3; // w: angular speed
     this.newAngle = 0;
+    this.img = img;
 
     // radius of snowflake spiral
     // chosen so the snowflakes are uniformly spread out in area
@@ -77,9 +81,15 @@ var sketch = function(p) {
     };
 
     this.display = function() {
-      let opacity = p.random(0.4, 0.5);
-      p.stroke(255, 0.4);
-      p.ellipse(this.posX, this.posY, this.size);
+      // ellipse
+      // let opacity = p.random(0.4, 0.5);
+      // p.stroke(255, 0.4);
+      // p.ellipse(this.posX, this.posY, this.size);
+      
+      // image
+      p.imageMode(p.CENTER);
+      let sizeVar = p.random(20, 30);
+      p.image(this.img, this.posX, this.posY, sizeVar, sizeVar);
     };
   }
 }

@@ -21,8 +21,8 @@ import {drawKeypoints, drawSkeleton, drawBoundingBox} from './demo_util';
 
 // const videoWidth = screen.width;
 // const videoHeight = screen.height;
-const videoWidth = 720;
-const videoHeight = 450;
+const videoWidth = 1920;
+const videoHeight = 1080;
 
 console.log("=========================+>");
 console.log(videoWidth, videoHeight);
@@ -230,6 +230,7 @@ function detectPoseInRealTime(video, net) {
     const outputStride = +guiState.input.outputStride;
 
     let poses = [];
+    
     let minPoseConfidence;
     let minPartConfidence;
     switch (guiState.algorithm) {
@@ -247,7 +248,7 @@ function detectPoseInRealTime(video, net) {
             guiState.multiPoseDetection.maxPoseDetections,
             guiState.multiPoseDetection.minPartConfidence,
             guiState.multiPoseDetection.nmsRadius);
-
+        
         minPoseConfidence = +guiState.multiPoseDetection.minPoseConfidence;
         minPartConfidence = +guiState.multiPoseDetection.minPartConfidence;
         break;
@@ -266,6 +267,21 @@ function detectPoseInRealTime(video, net) {
     // For each pose (i.e. person) detected in an image, loop through the poses
     // and draw the resulting skeleton and keypoints if over certain confidence
     // scores
+
+    if (poses.length === 0) {
+      // console.log("NO ONE");
+      var span = document.getElementById("warning");
+      span.style.fontSize = "120px";
+      span.style.color = "white";
+      span.innerHTML = "LET IT SNOW " + "<br /><br />" + "여러 사람과 함께 눈을 내리게 해보세요!"
+      // let thisDiv = document.getElementById("sketchDiv")
+      // thisDiv.innerHTML = "PLEASE"
+    } else {
+      var span = document.getElementById("warning");
+      span.innerHTML = "";
+      // console.log("person detected");
+    }
+
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         if (guiState.output.showPoints) {
@@ -288,6 +304,7 @@ function detectPoseInRealTime(video, net) {
 
   poseDetectionFrame();
 }
+
 
 /**
  * Kicks off the demo by loading the posenet model, finding and loading
