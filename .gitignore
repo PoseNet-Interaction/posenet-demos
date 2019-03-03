@@ -7,7 +7,6 @@ dist/
 **/*/yarn-error.log
 **/*/yalc.lock
 **/*/.yalc
-**/*/yarn.lock
 
 .rpt2_cache/
 
