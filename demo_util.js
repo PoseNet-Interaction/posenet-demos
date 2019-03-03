@@ -18,9 +18,9 @@ import * as tf from '@tensorflow/tfjs';
 import * as posenet from '@tensorflow-models/posenet';
 import { decodeMatrixFromUnpackedColorRGBAArray } from '@tensorflow/tfjs-core/dist/kernels/webgl/tex_util';
 
-let color = 'rgba(255, 255, 255, 0.3)';
-const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
-const lineWidth = 10;
+let color = 'red';
+const boundingBoxColor = 'aqua'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
+const lineWidth = 2;
 
 function toTuple({
   y,
@@ -40,7 +40,14 @@ export function drawPoint(ctx, y, x, r, color) {
  * Draws a line on a canvas, i.e. a joint
  */
 export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
-
+  ctx.beginPath();
+  ctx.moveTo(ax * scale, ay * scale);
+  ctx.lineTo(bx * scale, by * scale);
+  ctx.lineWidth = lineWidth;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  
+  /** customized version
   // ax > bx
   // ay > by
   if (adjacentBool == false) {
@@ -54,7 +61,7 @@ export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
   } else {
     //nothing
   }
-
+   */
 }
 
 /**
@@ -76,6 +83,38 @@ let right = ["rightElbow"];
  * Draw pose keypoints onto a canvas
  */
 
+export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
+  for (let i = keypoints.length - 1; i >= 0; i--) {
+    const keypoint = keypoints[i];
+
+    if (keypoint.score < minConfidence) {
+      continue;
+    }
+
+    const {
+      y,
+      x
+    } = keypoint.position;
+
+    console.log("---drawKeypoints---");
+    if (i == 5) {
+      console.log("leftShoulder", x, y);
+    } else if (i == 6) {
+      console.log("rightShoulder", x, y);
+    } else if (i == 7) {
+      console.log("leftElbow", x, y);
+    } else if (i == 8) {
+      console.log("rightElbow", x, y);
+    } else if (i == 13) {
+      console.log("leftKnee", x, y);
+    } else if (i == 14) {
+      console.log("rightKnee", x, y);
+    } 
+    drawPoint(ctx, y * scale, x * scale, 3, color);
+  }
+}
+
+/** customized version
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
   //save five to a text file
   // five[i][0] == nose
@@ -149,6 +188,7 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
     }
   }
 }
+ */
 
 /**
  * Draw the bounding box of a pose. For example, for a whole person standing
@@ -189,7 +229,8 @@ export function drawBoundingBox(keypoints, ctx) {
     // 4. if adjacentBool is TRUE, don't change to false until
     // compareArrays show nothing overlaps..
   }
-
+  console.log("=======DRAW BOUNDING BOX========");
+  console.log(boxCoord);
 
   ctx.strokeStyle = boundingBoxColor;
   ctx.stroke();

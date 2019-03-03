@@ -66,9 +66,9 @@ const {partIds, poseChain} = posenet;
 function drawResults(canvas, poses, minPartConfidence, minPoseConfidence) {
   renderImageToCanvas(image, [513, 513], canvas);
   poses.forEach((pose) => {
-    console.log("=========drawResults coco.js========");
-    console.log(pose);
-    console.log("=========end one call=========");
+    // console.log("=========drawResults coco.js========");
+    // console.log(pose);
+    // console.log("=========end one call=========");
     if (pose.score >= minPoseConfidence) {
       if (guiState.showKeypoints) {
         drawKeypoints(
