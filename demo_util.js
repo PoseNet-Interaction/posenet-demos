@@ -40,6 +40,7 @@ export function drawPoint(ctx, y, x, r, color) {
  * Draws a line on a canvas, i.e. a joint
  */
 export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
+
   // ax > bx
   // ay > by
   if (adjacentBool == false) {
@@ -56,11 +57,10 @@ export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
 
 }
 
-
 /**
  * Draws a pose skeleton by looking up all adjacent keypoints/joints
  */
-export function drawSkeleton(keypoints, minConfidence, ctx, scale = 0.5) {
+export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
   const adjacentKeyPoints = posenet.getAdjacentKeyPoints(
     keypoints, minConfidence);
 
@@ -75,6 +75,7 @@ let right = ["rightElbow"];
 /**
  * Draw pose keypoints onto a canvas
  */
+
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
   //save five to a text file
   // five[i][0] == nose
@@ -97,39 +98,47 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
       } else {
         let img0 = new Image();
         img0.src = "olafFace.png";
-        ctx.drawImage(img0, scale*(x-200), scale*(y-30), 300, 300);
+        ctx.drawImage(img0, scale*(x-150), scale*(y - 300), 300, 300);
       }
-    } else if (i == 9) { // leftWrist
+    } else if (i == 9) { // leftWrist - my right
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
         let img9 = new Image();
         img9.src = "rightHand_orange.png";
-        ctx.drawImage(img9, scale*(x-200), scale*(y-400), 200, 200);
+        ctx.drawImage(img9, scale*(x + 100), scale*(y-300), 200, 200);
       }
-    } else if (i == 10) { // rightWrist
+    } else if (i == 10) { // rightWrist - my left
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
         let img9 = new Image();
         img9.src = "leftHand_orange.png";
-        ctx.drawImage(img9, scale*(x-200), scale*(y-400), 200, 200);
+        ctx.drawImage(img9, scale*(x - 200), scale*(y-300), 200, 200);
       }
-    } else if (i == 13 || i == 14) { // leftKnee 
+    } else if (i == 13) { // leftKnee - my right 
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {  
-        let img13 = new Image();
+        let img13 = new Image(); 
         img13.src = "olafLeftFoot.png";
-        ctx.drawImage(img13, scale*(x-150), scale*(y), 150, 150); 
+        ctx.drawImage(img13, scale*(x + 150), scale*(y + 150), 150, 150); 
       }      
-    } else if (i == 6) { // rightShoulder 
+    } else if (i == 14) { // rightKnee 
+      if (adjacentBool == false) {
+        drawPoint(ctx, y * scale, x * scale, 50, color);
+      } else {  
+        let img14 = new Image();
+        img14.src = "olafRightFoot.png";
+        ctx.drawImage(img14, scale*(x-150), scale*(y + 150), 150, 150); 
+      }      
+    }  else if (i == 6) { // rightShoulder 
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {   
         let img6 = new Image();
         img6.src = "olafBodySum.png";
-        ctx.drawImage(img6, scale*(x - 30), scale*(y + 300), 200, 200);
+        ctx.drawImage(img6, scale*(x - 30), scale*(y + 100), 250, 250);
       }
     } else if (i == 1 || i == 2 || i == 3 || i == 4) {
     } else {
@@ -156,24 +165,21 @@ var ele = document.getElementById('boolean');
 export function drawBoundingBox(keypoints, ctx) {
   const boundingBox = posenet.getBoundingBox(keypoints);
   ctx.rect(boundingBox.minX, boundingBox.minY,
-    boundingBox.maxX - boundingBox.minX, boundingBox.maxY - boundingBox.minY);
-
-  // console.log("=======DRAW BOUNDING BOX========");
+    boundingBox.maxX - boundingBox.minX, boundingBox.maxY - boundingBox.minY);  
   // BOXCOORD[X]
   // X = 0: left top, 1: right top, 2: right bottom, 3: left bottom
 
   // 1. adding COORDINATES the array
   let boxCoord = posenet.getBoundingBoxPoints(keypoints);
-  if (leftSide.length < 20) {
+  if (leftSide.length < 25) {
     leftSide.push(boxCoord[0].x);
     // console.log(leftSide);
-  } if (rightSide.length < 20) {
+  } if (rightSide.length < 25) {
     rightSide.push(boxCoord[1].x);
     // console.log(rightSide);
   }
-
   // 2. WHEN ARRAY IS FULL
-  if (leftSide.length == 20 && rightSide.length == 20) {
+  if (leftSide.length == 25 && rightSide.length == 25) {
     leftSide = leftSide.sort((a,b) => a-b);
     rightSide = rightSide.sort((a,b) => a-b);
 
@@ -183,6 +189,7 @@ export function drawBoundingBox(keypoints, ctx) {
     // 4. if adjacentBool is TRUE, don't change to false until
     // compareArrays show nothing overlaps..
   }
+
 
   ctx.strokeStyle = boundingBoxColor;
   ctx.stroke();
