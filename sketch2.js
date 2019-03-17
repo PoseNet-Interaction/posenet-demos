@@ -1,6 +1,6 @@
 import * as p from 'p5';
 import {videoWidth, videoHeight} from './camera';
-import {adjacentBool, boxLeftArray, boxRightArray} from './demo_util';
+import { adjacentBool } from './demo_util';
 
 let width = videoWidth;
 let height = videoHeight;
@@ -9,10 +9,12 @@ let bool = adjacentBool;
 var sketch = function(p) {
   let canvasp;
   let snowflakes = [];
-  let singleFlake;
+  let sakura;
+  let leave;
 
   p.preload = function() {
-    singleFlake = p.loadImage('sakuraCo1.png');
+    sakura = p.loadImage('sakuraBlur2.png');
+    leave = p.loadImage('leavesBlur2.png');
   }
 
   p.setup = function() {
@@ -23,19 +25,15 @@ var sketch = function(p) {
   };
 
   p.draw = function() {
-    // array  & boolean
-    if (boxLeftArray.length === 25 && boxRightArray.length === 25) {
-      console.log("array full: ", boxLeftArray.length, ", ", "boxRightArray");
-    }
-    
     // UPDATE background
     p.background(0);
     let t = p.frameCount / 60;
     // CREATE a random number of snowflakes each frame
     bool = adjacentBool;
-
-    for (var i = 0; i < p.random(3); i++) {
-      snowflakes.push(new snowflake(singleFlake)); // append snowflake object
+    if (bool === true) {
+        snowflakes.push(new snowflake(sakura)); // append snowflake object
+    } else {
+        snowflakes.push(new snowflake(leave)); // append snowflake object
     }
 
    // LOOP through snowflakes with a for..of loop
@@ -80,7 +78,7 @@ var sketch = function(p) {
     this.display = function() {
       p.tint(this.lifespan*2);
       p.imageMode(p.CENTER);
-      p.image(this.img, this.posX, this.posY, 36, 36);
+      p.image(this.img, this.posX, this.posY, 48, 48);
     };
   }
 }

@@ -19,9 +19,9 @@ import * as posenet from '@tensorflow-models/posenet';
 import { decodeMatrixFromUnpackedColorRGBAArray } from '@tensorflow/tfjs-core/dist/kernels/webgl/tex_util';
 
 let color = 'rgba(255, 255, 255, 0.3)';
-let color2 = 'rgba(225, 0, 0, 0.5)'
+let color2 = 'rgba(240, 112, 161, 0.5)'
 const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
-const lineWidth = 10;
+const lineWidth = 8;
 
 function toTuple({
   y,
@@ -41,21 +41,17 @@ export function drawPoint(ctx, y, x, r, color) {
  * Draws a line on a canvas, i.e. a joint
  */
 export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
-
-  // ax > bx
-  // ay > by
-  if (adjacentBool == false) {
-    ctx.beginPath();
-    ctx.setLineDash([10, 15]);
-    ctx.moveTo(ax * scale, ay * scale);
-    ctx.lineTo(bx * scale, by * scale);
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = 'rgba(200, 200, 0)';
-    ctx.stroke();
+  ctx.beginPath();
+  ctx.setLineDash([10, 15]);
+  ctx.moveTo(ax * scale, ay * scale);
+  ctx.lineTo(bx * scale, by * scale);
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+  if (adjacentBool == true) {
+    ctx.strokeStyle = 'rgba(240, 112, 161, 0.5)';
   } else {
-    //nothing
+    ctx.strokeStyle = 'rgba(0, 214, 21, 0.5)';
   }
-
 }
 
 /**
@@ -73,13 +69,11 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
 
 let left = ["leftElbow"];
 let right = ["rightElbow"];
-let headCoordX;
-let headCoordY;
 let adjacentBool;
+
 /**
  * Draw pose keypoints onto a canvas
  */
-
 export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
   //save five to a text file
   // five[i][0] == nose
@@ -96,49 +90,18 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
       y,
       x
     } = keypoint.position;
-    if (i == 0) {  // nose
-      if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {
-        // console.log("demo_util.js nose x: ", x, ", y:", y);
-        // noseCoordHtml.innerHTML = x;
+    if (i == 0) { // head - nose
+      if (adjacentBool == true) {
         drawPoint(ctx, y * scale, x * scale, 50, color2);
-      }
-    } else if (i == 9) { // leftWrist - my right
-      if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
-        drawPoint(ctx, y * scale, x * scale, 50, color2);
-      }
-    } else if (i == 10) { // rightWrist - my left
-      if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {
-        drawPoint(ctx, y * scale, x * scale, 50, color2);
-      }
-    } else if (i == 13) { // leftKnee - my right
-      if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {
-        drawPoint(ctx, y * scale, x * scale, 50, color2);
-      }
-    } else if (i == 14) { // rightKnee
-      if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {
-        drawPoint(ctx, y * scale, x * scale, 50, color2);
-      }
-    }  else if (i == 6) { // rightShoulder
-      if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {
-        drawPoint(ctx, y * scale, x * scale, 50, color2);
       }
     } else if (i == 1 || i == 2 || i == 3 || i == 4) {
     } else {
-      if (adjacentBool == false) {
-        drawPoint(ctx, y * scale, x * scale, 50, color);
+       if (adjacentBool == true) {
+        drawPoint(ctx, y * scale, x * scale, 30, color2);
       } else {
+        drawPoint(ctx, y * scale, x * scale, 30, color);
       }
     }
   }
@@ -166,10 +129,8 @@ export function drawBoundingBox(keypoints, ctx) {
 
   if (leftSide.length < 25) {
     leftSide.push(boxCoord[0].x);
-    // console.log(leftSide);
   } if (rightSide.length < 25) {
     rightSide.push(boxCoord[1].x);
-    // console.log(rightSide);
   }
   // 2. WHEN ARRAY IS FULL
   if (leftSide.length == 25 && rightSide.length == 25) {
@@ -185,8 +146,6 @@ export function drawBoundingBox(keypoints, ctx) {
   ctx.strokeStyle = boundingBoxColor;
   ctx.stroke();
 }
-
-export {leftSide as boxLeftArray, rightSide as boxRightArray};
 
 async function compareArrays(a, b) {
   let count = 0;
