@@ -19,6 +19,7 @@ import * as posenet from '@tensorflow-models/posenet';
 import { decodeMatrixFromUnpackedColorRGBAArray } from '@tensorflow/tfjs-core/dist/kernels/webgl/tex_util';
 
 let color = 'rgba(255, 255, 255, 0.3)';
+let color2 = 'rgba(225, 0, 0, 0.5)'
 const boundingBoxColor = 'transparent'; //'rgba(255, 255, 255, 0.2)' white & almost transparent
 const lineWidth = 10;
 
@@ -72,11 +73,16 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
 
 let left = ["leftElbow"];
 let right = ["rightElbow"];
+let headCoordX;
+let headCoordY;
+let noseCoordHtml = document.getElementById('noseCoordXY');
+let boxCoordHtml = document.getElementById('boxCoord');
+let adjacentBool;
 /**
  * Draw pose keypoints onto a canvas
  */
 
-export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
+export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
   //save five to a text file
   // five[i][0] == nose
   // nose 끼리 비교해서 가까운 애들이 10px 안에 있으면 색깔 체인지
@@ -96,55 +102,45 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
-        let img0 = new Image();
-        img0.src = "olafFace.png";
-        ctx.drawImage(img0, scale*(x-150), scale*(y - 300), 300, 300);
+        // console.log("demo_util.js nose x: ", x, ", y:", y);
+        // noseCoordHtml.innerHTML = x;
+        drawPoint(ctx, y * scale, x * scale, 50, color2);
       }
     } else if (i == 9) { // leftWrist - my right
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
-        let img9 = new Image();
-        img9.src = "rightHand_orange.png";
-        ctx.drawImage(img9, scale*(x + 100), scale*(y-300), 200, 200);
+        drawPoint(ctx, y * scale, x * scale, 50, color2);
       }
     } else if (i == 10) { // rightWrist - my left
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
       } else {
-        let img9 = new Image();
-        img9.src = "leftHand_orange.png";
-        ctx.drawImage(img9, scale*(x - 200), scale*(y-300), 200, 200);
+        drawPoint(ctx, y * scale, x * scale, 50, color2);
       }
-    } else if (i == 13) { // leftKnee - my right 
+    } else if (i == 13) { // leftKnee - my right
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {  
-        let img13 = new Image(); 
-        img13.src = "olafLeftFoot.png";
-        ctx.drawImage(img13, scale*(x + 150), scale*(y + 150), 150, 150); 
-      }      
-    } else if (i == 14) { // rightKnee 
+      } else {
+        drawPoint(ctx, y * scale, x * scale, 50, color2);
+      }
+    } else if (i == 14) { // rightKnee
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {  
-        let img14 = new Image();
-        img14.src = "olafRightFoot.png";
-        ctx.drawImage(img14, scale*(x-150), scale*(y + 150), 150, 150); 
-      }      
-    }  else if (i == 6) { // rightShoulder 
+      } else {
+        drawPoint(ctx, y * scale, x * scale, 50, color2);
+      }
+    }  else if (i == 6) { // rightShoulder
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {   
-        let img6 = new Image();
-        img6.src = "olafBodySum.png";
-        ctx.drawImage(img6, scale*(x - 30), scale*(y + 100), 250, 250);
+      } else {
+        drawPoint(ctx, y * scale, x * scale, 50, color2);
       }
     } else if (i == 1 || i == 2 || i == 3 || i == 4) {
     } else {
       if (adjacentBool == false) {
         drawPoint(ctx, y * scale, x * scale, 50, color);
-      } else {  
+      } else {
       }
     }
   }
@@ -158,19 +154,21 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 0.5) {
 
 let leftSide = [];
 let rightSide = [];
-let adjacentBool;
 let htmlVal;
-var ele = document.getElementById('boolean');
+// let ele = document.getElementById('boolean');
+
 
 export function drawBoundingBox(keypoints, ctx) {
   const boundingBox = posenet.getBoundingBox(keypoints);
   ctx.rect(boundingBox.minX, boundingBox.minY,
-    boundingBox.maxX - boundingBox.minX, boundingBox.maxY - boundingBox.minY);  
+    boundingBox.maxX - boundingBox.minX, boundingBox.maxY - boundingBox.minY);
   // BOXCOORD[X]
   // X = 0: left top, 1: right top, 2: right bottom, 3: left bottom
 
   // 1. adding COORDINATES the array
   let boxCoord = posenet.getBoundingBoxPoints(keypoints);
+  // console.log("boxCoord return type:", typeof(boxCoord)); // object
+
   if (leftSide.length < 25) {
     leftSide.push(boxCoord[0].x);
     // console.log(leftSide);
@@ -184,16 +182,19 @@ export function drawBoundingBox(keypoints, ctx) {
     rightSide = rightSide.sort((a,b) => a-b);
 
     // 3. COMPARE FULL ARRAYS
+
     compareArrays(leftSide, rightSide);
 
     // 4. if adjacentBool is TRUE, don't change to false until
     // compareArrays show nothing overlaps..
   }
-
-
   ctx.strokeStyle = boundingBoxColor;
   ctx.stroke();
 }
+
+export {leftSide as boxLeftArray, rightSide as boxRightArray};
+
+
 
 async function compareArrays(a, b) {
   let count = 0;
@@ -220,20 +221,22 @@ async function compareArrays(a, b) {
   leftSide = [];
   rightSide = [];
 
-  if (adjacentBool === true) {
-    htmlVal = 'adjacent';
-  } else {
-    htmlVal = 'notAdjacent';
-  }
-  boolValue(htmlVal);
+  // if (adjacentBool === true) {
+  //   htmlVal = 'adjacent';
+  // } else {
+  //   htmlVal = 'notAdjacent';
+  // }
+  // boolValue(htmlVal);
 }
 
+export {adjacentBool};
 
-export async function boolValue(htmlValue) {
-  ele.innerHTML = htmlValue;
-  // console.log(htmlValue);
-  // console.log(ele.innerHTML);
-}
+
+// export async function boolValue(htmlValue) {
+//   ele.innerHTML = htmlValue;
+//   // console.log(htmlValue);
+//   // console.log(ele.innerHTML);
+// }
 /**
  * Converts an arary of pixel data into an ImageData object
  */

@@ -1,19 +1,22 @@
 import * as p from 'p5';
 import {videoWidth, videoHeight} from './camera';
+import {adjacentBool, boxLeftArray} from './demo_util';
 
 
 let width = videoWidth;
 let height = videoHeight;
-
+let bool = adjacentBool;
 var sketch = function(p) {
   let canvasp;
   let snowflakes = [];
   let singleFlake;
-  let ele = document.getElementById("boolean"); // GET p id
-  let bool; // GET changing innerHTML value
-  
+  // let ele = document.getElementById("boolean"); // GET p id
+  // let bool; // GET changing innerHTML value
+  // let noseX;
+  // let noseCoordXY = document.getElementById("noseCoordXY");
+
   p.preload = function() {
-    singleFlake = p.loadImage('snowflake.png');
+    singleFlake = p.loadImage('sakuraCo1.png');
   }
 
   p.setup = function() {
@@ -21,26 +24,31 @@ var sketch = function(p) {
     p.background('rgba(0,0,0, 0.5)');
     canvasp.position(0, 0);
     canvasp.style('z-index', '-1');
-    bool = ele.innerHTML;
-    console.log("initial", bool);
+    // bool = ele.innerHTML;
+    // console.log("initial", bool);
 
 
   };
 
   p.draw = function() {
     // GRAB html element to check boolean value from demo_util.js
-    bool = ele.innerHTML;
+
     // UPDATE background
     p.background(0);
     let t = p.frameCount / 60;
-    // console.log("bool is", adjacentBool);
+
     // CREATE a random number of snowflakes each frame
-    if (bool === 'adjacent') {
-     console.log(bool);
-     for (var i = 0; i < p.random(3); i++) {
-       snowflakes.push(new snowflake(singleFlake)); // append snowflake object
-     }
-  };
+    bool = adjacentBool;
+    if (bool === true) {
+     // console.log("p5js: ",bool);
+     // for (var i = 0; i < p.random(3); i++) {
+     //   snowflakes.push(new snowflake(singleFlake)); // append snowflake object
+     // }
+    };
+
+    for (var i = 0; i < p.random(3); i++) {
+      snowflakes.push(new snowflake(singleFlake)); // append snowflake object
+    }
 
    // LOOP through snowflakes with a for..of loop
    for (let flake of snowflakes) {
@@ -59,6 +67,7 @@ var sketch = function(p) {
     this.speed = 0.3; // w: angular speed
     this.newAngle = 0;
     this.img = img;
+    this.lifespan = 255.0;
 
     // radius of snowflake spiral
     // chosen so the snowflakes are uniformly spread out in area
@@ -73,23 +82,23 @@ var sketch = function(p) {
       // different size snowflakes fall at slightly different y speeds
       this.posY += p.pow(this.size, 0.3);
 
+      this.lifespan -= 3.0;
       // delete snowflake if past end of screen
-        if (this.posY > height) {
+        if (this.lifespan < 0.0) {
           let index = snowflakes.indexOf(this);
           snowflakes.splice(index, 1);
         }
     };
 
     this.display = function() {
-      // ellipse
-      // let opacity = p.random(0.4, 0.5);
-      // p.stroke(255, 0.4);
-      // p.ellipse(this.posX, this.posY, this.size);
-      
-      // image
       p.imageMode(p.CENTER);
-      let sizeVar = p.random(20, 30);
-      p.image(this.img, this.posX, this.posY, sizeVar, sizeVar);
+      p.tint(this.lifespan*2);
+      p.push();
+      p.translate(this.posX, this.posY);
+      p.rotate(Math.sin(this.lifespan/2)*2);
+      p.imageMode(p.CENTER);
+      p.image(this.img, 0, 0, 48, 48);
+      p.pop();
     };
   }
 }
