@@ -75,8 +75,6 @@ let left = ["leftElbow"];
 let right = ["rightElbow"];
 let headCoordX;
 let headCoordY;
-let noseCoordHtml = document.getElementById('noseCoordXY');
-let boxCoordHtml = document.getElementById('boxCoord');
 let adjacentBool;
 /**
  * Draw pose keypoints onto a canvas
@@ -154,9 +152,6 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
 
 let leftSide = [];
 let rightSide = [];
-let htmlVal;
-// let ele = document.getElementById('boolean');
-
 
 export function drawBoundingBox(keypoints, ctx) {
   const boundingBox = posenet.getBoundingBox(keypoints);
@@ -182,7 +177,6 @@ export function drawBoundingBox(keypoints, ctx) {
     rightSide = rightSide.sort((a,b) => a-b);
 
     // 3. COMPARE FULL ARRAYS
-
     compareArrays(leftSide, rightSide);
 
     // 4. if adjacentBool is TRUE, don't change to false until
@@ -193,8 +187,6 @@ export function drawBoundingBox(keypoints, ctx) {
 }
 
 export {leftSide as boxLeftArray, rightSide as boxRightArray};
-
-
 
 async function compareArrays(a, b) {
   let count = 0;
@@ -215,28 +207,13 @@ async function compareArrays(a, b) {
   // 3번 이상 범주 안에 들어오면 겹쳤다고 판단. TRUE로 변경
   adjacentBool = (count > 3) ? true : false;
 
-  // (adjacentBool === true) ? (color = "rgba(0, 255, 0, 0.3)") : (color = "rgba(255, 255, 255, 0.3)");
-
   // RESET. count 끝나면 원상복귀.
   leftSide = [];
   rightSide = [];
-
-  // if (adjacentBool === true) {
-  //   htmlVal = 'adjacent';
-  // } else {
-  //   htmlVal = 'notAdjacent';
-  // }
-  // boolValue(htmlVal);
 }
 
 export {adjacentBool};
 
-
-// export async function boolValue(htmlValue) {
-//   ele.innerHTML = htmlValue;
-//   // console.log(htmlValue);
-//   // console.log(ele.innerHTML);
-// }
 /**
  * Converts an arary of pixel data into an ImageData object
  */
