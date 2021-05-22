@@ -82,7 +82,9 @@ export function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
     } else if (i == 1 || i == 2 || i == 3) {
     } else if (i == 4) {
       var img = new Image();
-      img.src = "9gag_Face.png";
+      img.src = "doge.png";
+      // drawPoint(ctx, y * scale, x * scale, 60, 'red' );
+
       ctx.drawImage(img, x-140, y-100);
     } else {
       drawPoint(ctx, y * scale, x * scale, 10, color);
